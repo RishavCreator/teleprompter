@@ -523,6 +523,9 @@ class TeleprompterController {
     this.originalText = "";
     this.textPreview.innerHTML =
       "<p>Upload your manuscript or type your text here...</p>";
+    if (this.fileUpload) {
+      this.fileUpload.value = "";
+    }
     this.sendTextUpdate();
     this.reset();
     this.updateDurationCalculations();
@@ -866,8 +869,9 @@ class TeleprompterController {
 
   formatTextForTeleprompter() {
     const currentText =
-      this.textPreview.textContent || this.textPreview.innerText || "";
-    if (!currentText.trim()) {
+      this.originalText || this.textPreview.textContent || this.textPreview.innerText || "";
+    
+    if (!currentText.trim() || currentText.includes("Upload your manuscript")) {
       alert(
         "No text to format. Please upload a manuscript or enter text first.",
       );
@@ -876,6 +880,14 @@ class TeleprompterController {
 
     const formattedText = this.formatTextForTeleprompterStandards(currentText);
     this.setPrompterTextDirectly(formattedText);
+    
+    // Provide visual feedback
+    const originalBg = this.textPreview.style.backgroundColor;
+    this.textPreview.style.transition = "background-color 0.3s";
+    this.textPreview.style.backgroundColor = "#e8f5e9";
+    setTimeout(() => {
+      this.textPreview.style.backgroundColor = originalBg;
+    }, 300);
   }
 
   setPrompterTextDirectly(text) {
