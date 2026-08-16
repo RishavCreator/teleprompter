@@ -181,6 +181,10 @@ class TeleprompterDisplay {
         this.reset();
         break;
 
+      case "scroll":
+        this.scrollManual(data.amount);
+        break;
+
       case "pong":
         // Heartbeat response
         break;
@@ -372,6 +376,17 @@ class TeleprompterDisplay {
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
+    }
+  }
+
+  scrollManual(amount) {
+    this.currentPosition += amount;
+    if (this.currentPosition < 0) this.currentPosition = 0;
+    
+    // Update transform immediately if paused, otherwise animation loop will pick it up
+    if (!this.isPlaying) {
+      const translateY = -(this.currentPosition / window.innerHeight) * 100;
+      this.prompterText.style.transform = `translateY(${translateY}%)`;
     }
   }
 

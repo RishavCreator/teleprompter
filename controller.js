@@ -56,6 +56,7 @@ class TeleprompterController {
     this.displayUrl = document.getElementById("display-url");
     this.copyUrlBtn = document.getElementById("copy-url");
     this.showQrBtn = document.getElementById("show-qr");
+    this.toggleSidebarBtn = document.getElementById("toggle-sidebar");
     this.qrContainer = document.getElementById("qr-container");
     this.qrCanvas = document.getElementById("qr-canvas");
     this.formatBtn = document.getElementById("format-text");
@@ -108,6 +109,20 @@ class TeleprompterController {
     this.formatBtn.addEventListener("click", () =>
       this.formatTextForTeleprompter(),
     );
+
+    if (this.toggleSidebarBtn) {
+      this.toggleSidebarBtn.addEventListener("click", () => {
+        const sidebar = document.querySelector('.controls-section');
+        const container = document.querySelector('.controller-content');
+        if (sidebar.style.display === 'none') {
+          sidebar.style.display = 'block';
+          container.style.gridTemplateColumns = '350px 1fr';
+        } else {
+          sidebar.style.display = 'none';
+          container.style.gridTemplateColumns = '1fr';
+        }
+      });
+    }
 
     // Initially show formatting options
     this.formattingOptions.style.display = "block";
@@ -239,7 +254,58 @@ class TeleprompterController {
   handleMessage(data) {
     switch (data.type) {
       case "stateSync":
-        // Server is syncing state - we're already the source of truth
+        // Server is syncing state - we're already the source of truth, 
+        // but let's sync some remote controls if needed
+        if (data.state.isPlaying) {
+          this.isPlaying = true;
+          this.isPaused = false;
+          this.startBtn.disabled = true;
+          this.pauseBtn.disabled = false;
+          this.startTimer();
+          this.startScrolling();
+        }
+        break;
+
+      case "start":
+        this.isPlaying = true;
+        this.isPaused = false;
+        this.startBtn.disabled = true;
+        this.pauseBtn.disabled = false;
+        this.startTimer();
+        this.startScrolling();
+        break;
+
+      case "pause":
+        this.isPlaying = false;
+        this.isPaused = true;
+        this.startBtn.disabled = false;
+        this.pauseBtn.disabled = true;
+        this.stopTimer();
+        this.stopScrolling();
+        break;
+
+      case "reset":
+        this.isPlaying = false;
+        this.isPaused = false;
+        this.currentPosition = 0;
+        this.startBtn.disabled = false;
+        this.pauseBtn.disabled = true;
+        this.stopTimer();
+        this.stopScrolling();
+        const previewArea = document.getElementById('text-preview');
+        if (previewArea) previewArea.scrollTop = 0;
+        this.updateDisplay();
+        break;
+        
+      case "scroll":
+        this.scrollManual(data.amount);
+        break;
+        
+      case "setSpeed":
+        this.speed = data.value;
+        if (this.speedControl) this.speedControl.value = data.value;
+        if (this.speedDisplay) this.speedDisplay.textContent = data.value;
+        this.updateDurationCalculations();
         break;
 
       case "pong":
@@ -253,6 +319,13 @@ class TeleprompterController {
       default:
         console.log("Unknown message type:", data.type);
     }
+  }
+
+  scrollManual(amount) {
+    this.currentPosition += amount;
+    if (this.currentPosition < 0) this.currentPosition = 0;
+    const previewArea = document.getElementById('text-preview');
+    if (previewArea) previewArea.scrollTop = this.currentPosition;
   }
 
   updateConnectionInfo(data) {
@@ -510,6 +583,7 @@ class TeleprompterController {
 
     this.sendMessage({ type: "start" });
     this.startTimer();
+    this.startScrolling();
   }
 
   pause() {
@@ -522,6 +596,7 @@ class TeleprompterController {
 
     this.sendMessage({ type: "pause" });
     this.stopTimer();
+    this.stopScrolling();
   }
 
   resume() {
@@ -534,6 +609,7 @@ class TeleprompterController {
 
     this.sendMessage({ type: "start" });
     this.startTimer();
+    this.startScrolling();
   }
 
   reset() {
@@ -548,6 +624,9 @@ class TeleprompterController {
 
     this.sendMessage({ type: "reset" });
     this.stopTimer();
+    this.stopScrolling();
+    const previewArea = document.getElementById('text-preview');
+    if (previewArea) previewArea.scrollTop = 0;
     this.updateDisplay();
   }
 
@@ -561,6 +640,33 @@ class TeleprompterController {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
       this.timerInterval = null;
+    }
+  }
+
+  startScrolling() {
+    const previewArea = document.getElementById('text-preview');
+    if (!previewArea) return;
+    
+    const scroll = () => {
+      if (!this.isPlaying) return;
+
+      const wordsPerSecond = this.speed / 60;
+      const pixelsPerSecond = wordsPerSecond * 12;
+      const pixelsPerFrame = pixelsPerSecond / 60;
+
+      this.currentPosition += pixelsPerFrame;
+      previewArea.scrollTop = this.currentPosition;
+
+      this.animationId = requestAnimationFrame(scroll);
+    };
+
+    this.animationId = requestAnimationFrame(scroll);
+  }
+
+  stopScrolling() {
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
     }
   }
 
@@ -670,7 +776,7 @@ class TeleprompterController {
       }
     }
     
-    this.currentDisplayUrl = `${protocol}//${hostname}${port}/display.html`;
+    this.currentDisplayUrl = `${protocol}//${hostname}${port}/remote.html`;
     this.displayUrl.textContent = this.currentDisplayUrl;
   }
 

@@ -8,14 +8,20 @@ const PORT = process.env.PORT || 8080;
 
 function getLocalIP() {
   const interfaces = os.networkInterfaces();
+  let ips = [];
+  
   for (const name of Object.keys(interfaces)) {
     for (const iface of interfaces[name]) {
       if (iface.family === "IPv4" && !iface.internal) {
-        return iface.address;
+        // Prioritize Wi-Fi or Wireless adapters
+        if (name.toLowerCase().includes('wi-fi') || name.toLowerCase().includes('wlan') || name.toLowerCase().includes('wireless')) {
+          return iface.address;
+        }
+        ips.push(iface.address);
       }
     }
   }
-  return "127.0.0.1";
+  return ips.length > 0 ? ips[0] : "127.0.0.1";
 }
 
 // Create HTTP server for serving static files
@@ -117,17 +123,17 @@ wss.on("connection", (ws, req) => {
 
         case "setText":
           currentState.text = data.content;
-          broadcastToDisplays({ type: "setText", content: data.content });
+          broadcastToAll({ type: "setText", content: data.content });
           break;
 
         case "setSpeed":
           currentState.speed = data.value;
-          broadcastToDisplays({ type: "setSpeed", value: data.value });
+          broadcastToAll({ type: "setSpeed", value: data.value });
           break;
 
         case "setFontSize":
           currentState.fontSize = data.value;
-          broadcastToDisplays({ type: "setFontSize", value: data.value });
+          broadcastToAll({ type: "setFontSize", value: data.value });
           break;
 
         case "setSegmentLength":
@@ -137,7 +143,7 @@ wss.on("connection", (ws, req) => {
             data.minutes || Math.floor(currentState.segmentLength / 60);
           currentState.segmentSeconds =
             data.seconds || currentState.segmentLength % 60;
-          broadcastToDisplays({
+          broadcastToAll({
             type: "setSegmentLength",
             totalSeconds: currentState.segmentLength,
             minutes: currentState.segmentMinutes,
@@ -147,22 +153,22 @@ wss.on("connection", (ws, req) => {
 
         case "setMirrorMode":
           currentState.mirrorMode = data.enabled;
-          broadcastToDisplays({ type: "setMirrorMode", enabled: data.enabled });
+          broadcastToAll({ type: "setMirrorMode", enabled: data.enabled });
           break;
 
         case "setHideTimer":
           currentState.hideTimer = data.enabled;
-          broadcastToDisplays({ type: "setHideTimer", enabled: data.enabled });
+          broadcastToAll({ type: "setHideTimer", enabled: data.enabled });
           break;
 
         case "setOnAir":
           currentState.onAir = data.enabled;
-          broadcastToDisplays({ type: "setOnAir", enabled: data.enabled });
+          broadcastToAll({ type: "setOnAir", enabled: data.enabled });
           break;
 
         case "setScheduledStart":
           currentState.scheduledStartTime = data.scheduledTime;
-          broadcastToDisplays({
+          broadcastToAll({
             type: "setScheduledStart",
             scheduledTime: data.scheduledTime,
           });
@@ -170,7 +176,7 @@ wss.on("connection", (ws, req) => {
 
         case "clearScheduledStart":
           currentState.scheduledStartTime = null;
-          broadcastToDisplays({ type: "clearScheduledStart" });
+          broadcastToAll({ type: "clearScheduledStart" });
           break;
 
         case "start":
@@ -179,22 +185,22 @@ wss.on("connection", (ws, req) => {
           currentState.onAir = true; // Automatically turn on air indicator
           currentState.scheduledStartTime = null; // Clear scheduled start
           currentState.startTime = Date.now() - (currentState.pausedTime || 0);
-          broadcastToDisplays({
+          broadcastToAll({
             type: "start",
             startTime: currentState.startTime,
             pausedTime: currentState.pausedTime,
           });
           // Send on air update to displays
-          broadcastToDisplays({ type: "setOnAir", enabled: true });
+          broadcastToAll({ type: "setOnAir", enabled: true });
           // Clear scheduled start on displays
-          broadcastToDisplays({ type: "clearScheduledStart" });
+          broadcastToAll({ type: "clearScheduledStart" });
           break;
 
         case "pause":
           currentState.isPlaying = false;
           currentState.isPaused = true;
           currentState.pausedTime = Date.now() - currentState.startTime;
-          broadcastToDisplays({
+          broadcastToAll({
             type: "pause",
             pausedTime: currentState.pausedTime,
           });
@@ -206,7 +212,11 @@ wss.on("connection", (ws, req) => {
           currentState.currentPosition = 0;
           currentState.startTime = null;
           currentState.pausedTime = 0;
-          broadcastToDisplays({ type: "reset" });
+          broadcastToAll({ type: "reset" });
+          break;
+
+        case "scroll":
+          broadcastToAll({ type: "scroll", amount: data.amount });
           break;
 
         case "ping":
@@ -261,9 +271,9 @@ function handleRegistration(ws, data) {
   broadcastConnectionCount();
 }
 
-function broadcastToDisplays(message) {
+function broadcastToAll(message) {
   const messageStr = JSON.stringify(message);
-  clients.displays.forEach((client) => {
+  [...clients.controllers, ...clients.displays].forEach((client) => {
     if (client.readyState === WebSocket.OPEN) {
       client.send(messageStr);
     }

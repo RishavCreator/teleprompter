@@ -20,6 +20,7 @@
             <span id="display-url">Open display.html</span>
             <button id="copy-url">Copy</button>
             <button id="show-qr" class="format-btn" style="margin-left: 5px;">QR Code</button>
+            <button id="toggle-sidebar" class="format-btn" style="margin-left: 5px;">Toggle Sidebar</button>
             <div id="qr-container" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 10px; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 100;">
               <canvas id="qr-canvas"></canvas>
             </div>
@@ -29,6 +30,31 @@
 
       <div class="controller-content">
         <div class="controls-section">
+          <div class="control-panel" style="border:none; padding:0 0 20px 0; margin-bottom: 20px; border-bottom: 1px solid #ddd; flex-direction: column; align-items: stretch; gap: 15px;">
+            <div class="playback-controls" style="display: flex; gap: 10px; width: 100%;">
+              <button id="start-btn" class="control-btn start" style="flex: 1; padding: 12px 10px;">
+                <span class="btn-icon">▶</span> Start
+              </button>
+              <button id="pause-btn" class="control-btn pause" disabled style="flex: 1; padding: 12px 10px;">
+                <span class="btn-icon">⏸</span> Pause
+              </button>
+              <button id="reset-btn" class="control-btn reset" style="flex: 1; padding: 12px 10px;">
+                <span class="btn-icon">⏹</span> Reset
+              </button>
+            </div>
+            <div class="timer-info" style="display: flex; justify-content: center; background: #f8f9fa; padding: 10px; border-radius: 6px;">
+              <div class="timer-display" style="gap: 30px;">
+                <div class="timer-item">
+                  <label>Segment Time:</label>
+                  <span id="segment-timer" style="font-size: 20px;">10:00</span>
+                </div>
+                <div class="timer-item">
+                  <label>Elapsed:</label>
+                  <span id="elapsed-timer" style="font-size: 20px;">00:00</span>
+                </div>
+              </div>
+            </div>
+          </div>
           <div class="control-group">
             <label for="file-upload">Upload Manuscript:</label>
             <input type="file" id="file-upload" accept=".txt,.docx,.pdf,.md" />
@@ -169,36 +195,6 @@
               <p>
                 The changes will be synchronized with the display in real-time.
               </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="control-panel">
-        <div class="playback-controls">
-          <button id="start-btn" class="control-btn start">
-            <span class="btn-icon">▶</span>
-            Start
-          </button>
-          <button id="pause-btn" class="control-btn pause" disabled>
-            <span class="btn-icon">⏸</span>
-            Pause
-          </button>
-          <button id="reset-btn" class="control-btn reset">
-            <span class="btn-icon">⏹</span>
-            Reset
-          </button>
-        </div>
-
-        <div class="timer-info">
-          <div class="timer-display">
-            <div class="timer-item">
-              <label>Segment Time:</label>
-              <span id="segment-timer">10:00</span>
-            </div>
-            <div class="timer-item">
-              <label>Elapsed:</label>
-              <span id="elapsed-timer">00:00</span>
             </div>
           </div>
         </div>
