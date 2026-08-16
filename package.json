@@ -2,10 +2,12 @@
   "name": "open-teleprompter",
   "version": "1.0.0",
   "description": "Open Teleprompter - A web-based teleprompter application with controller and display separation",
-  "main": "server.js",
+  "main": "main.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "start-electron": "electron .",
+    "dist": "electron-builder",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -35,5 +37,20 @@
   },
   "engines": {
     "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "electron": "^43.4.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.eyevinn.openteleprompter",
+    "productName": "Open Teleprompter",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "teleprompter icon.png"
+    }
   }
 }

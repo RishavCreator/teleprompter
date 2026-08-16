@@ -24,6 +24,7 @@ We welcome contributions to Open Teleprompter! This document outlines the proces
 ### Making Changes
 
 1. Create a new branch for your feature or bug fix:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -46,6 +47,7 @@ We welcome contributions to Open Teleprompter! This document outlines the proces
 ### Submitting Changes
 
 1. Push your branch to your fork:
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -104,6 +106,7 @@ By contributing to Open Teleprompter, you agree that your contributions will be 
 ## Questions?
 
 If you have questions about contributing, feel free to:
+
 - Ask in our [Slack community](http://slack.streamingtech.se)
 - Open an issue for discussion
 - Contact us at [work@eyevinn.se](mailto:work@eyevinn.se)

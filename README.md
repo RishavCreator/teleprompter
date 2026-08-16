@@ -13,11 +13,13 @@ Open Teleprompter provides a complete solution for professional teleprompter nee
 ## Screenshots
 
 ### Controller Interface
+
 The controller provides comprehensive management of your teleprompter session:
 
 ![Controller Interface](controller.png)
 
 ### Display Interface
+
 The clean, distraction-free display optimized for teleprompter use:
 
 ![Display Interface](display.png)
@@ -45,11 +47,13 @@ The clean, distraction-free display optimized for teleprompter use:
 ### Using Node.js
 
 1. **Install Dependencies**:
+
    ```bash
    npm install
    ```
 
 2. **Start the Server**:
+
    ```bash
    npm start
    ```
@@ -61,11 +65,13 @@ The clean, distraction-free display optimized for teleprompter use:
 ### Using Docker
 
 1. **Build the Docker Image**:
+
    ```bash
    docker build -t open-teleprompter .
    ```
 
 2. **Run the Container**:
+
    ```bash
    docker run -p 8080:8080 open-teleprompter
    ```
@@ -77,11 +83,13 @@ The clean, distraction-free display optimized for teleprompter use:
 ### Custom Port Configuration
 
 #### Node.js
+
 ```bash
 PORT=3000 npm start
 ```
 
 #### Docker
+
 ```bash
 docker run -p 3000:3000 -e PORT=3000 open-teleprompter
 ```

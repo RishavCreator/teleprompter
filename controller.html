@@ -1,182 +1,214 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Teleprompter Controller</title>
-    <link rel="stylesheet" href="controller.css">
-</head>
-<body>
+    <link rel="stylesheet" href="controller.css" />
+  </head>
+  <body>
     <div class="controller-container">
-        <header class="controller-header">
-            <h1>Teleprompter Controller</h1>
-            <div class="connection-info">
-                <div class="connection-status" id="connection-status">
-                    <span class="status-indicator disconnected">●</span>
-                    <span class="status-text">Disconnected</span>
-                </div>
-                <div class="display-url">
-                    <label>Display URL:</label>
-                    <span id="display-url">Open display.html</span>
-                    <button id="copy-url">Copy</button>
-                </div>
+      <header class="controller-header">
+        <h1>Teleprompter Controller</h1>
+        <div class="connection-info">
+          <div class="connection-status" id="connection-status">
+            <span class="status-indicator disconnected">●</span>
+            <span class="status-text">Disconnected</span>
+          </div>
+          <div class="display-url" style="position: relative;">
+            <label>Display URL:</label>
+            <span id="display-url">Open display.html</span>
+            <button id="copy-url">Copy</button>
+            <button id="show-qr" class="format-btn" style="margin-left: 5px;">QR Code</button>
+            <div id="qr-container" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 10px; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 100;">
+              <canvas id="qr-canvas"></canvas>
             </div>
-        </header>
+          </div>
+        </div>
+      </header>
 
-        <div class="controller-content">
-            <div class="controls-section">
-                <div class="control-group">
-                    <label for="file-upload">Upload Manuscript:</label>
-                    <input type="file" id="file-upload" accept=".txt,.docx,.pdf">
-                    <div class="file-options">
-                        <button id="clear-text">Clear</button>
-                        <button id="format-text" class="format-btn">Format for Teleprompter</button>
-                    </div>
-                    <div class="formatting-options" id="formatting-options">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="auto-format" checked>
-                            Auto-format on upload
-                        </label>
-                        <details class="format-details">
-                            <summary>Formatting Options</summary>
-                            <div class="format-checkboxes">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="format-caps" checked>
-                                    Convert to UPPERCASE
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="format-sentences" checked>
-                                    One sentence per line
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="format-paragraphs" checked>
-                                    Add paragraph breaks
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="format-punctuation" checked>
-                                    Enhance punctuation pauses
-                                </label>
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="format-numbers" checked>
-                                    Convert numbers to words
-                                </label>
-                            </div>
-                        </details>
-                    </div>
-                </div>
-                
-                <div class="control-group">
-                    <label for="speed-control">Speed (words/min):</label>
-                    <input type="range" id="speed-control" min="60" max="300" value="150">
-                    <span id="speed-display">150</span>
-                </div>
-                
-                <div class="control-group">
-                    <label for="segment-length">Segment Length:</label>
-                    <div class="time-input-group">
-                        <div class="time-input">
-                            <input type="number" id="segment-minutes" min="0" max="99" value="10">
-                            <label for="segment-minutes">min</label>
-                        </div>
-                        <div class="time-separator">:</div>
-                        <div class="time-input">
-                            <input type="number" id="segment-seconds" min="0" max="59" value="0">
-                            <label for="segment-seconds">sec</label>
-                        </div>
-                    </div>
-                    <div class="duration-info">
-                        <div class="info-row">
-                            <span>Word count: <span id="word-count">0</span></span>
-                        </div>
-                        <div class="info-row">
-                            <span>Expected duration: <span id="expected-duration">0:00</span></span>
-                        </div>
-                        <div class="info-row duration-diff" id="duration-diff">
-                            <span>Difference: <span id="diff-value">0:00</span></span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="control-group">
-                    <label for="font-size">Font Size:</label>
-                    <input type="range" id="font-size" min="16" max="72" value="48">
-                    <span id="font-size-display">48px</span>
-                </div>
-                
-                <div class="control-group">
-                    <label for="scheduled-start">Scheduled Start Time:</label>
-                    <div class="scheduled-time-group">
-                        <input type="datetime-local" id="scheduled-start" step="1">
-                        <button id="clear-schedule" class="control-btn">Clear</button>
-                    </div>
-                    <div class="schedule-info" id="schedule-info">
-                        <span>No scheduled start time set</span>
-                    </div>
-                </div>
-                
-                <div class="control-group">
-                    <label>Display Options:</label>
-                    <div class="checkbox-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="mirror-mode">
-                            Mirror Mode
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="hide-timer">
-                            Hide Timer
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="on-air-mode">
-                            On Air Indicator
-                        </label>
-                    </div>
-                </div>
+      <div class="controller-content">
+        <div class="controls-section">
+          <div class="control-group">
+            <label for="file-upload">Upload Manuscript:</label>
+            <input type="file" id="file-upload" accept=".txt,.docx,.pdf,.md" />
+            <div class="file-options">
+              <button id="clear-text">Clear</button>
+              <button id="format-text" class="format-btn">
+                Format for Teleprompter
+              </button>
             </div>
+            <div class="formatting-options" id="formatting-options">
+              <label class="checkbox-label">
+                <input type="checkbox" id="auto-format" checked />
+                Auto-format on upload
+              </label>
+              <details class="format-details">
+                <summary>Formatting Options</summary>
+                <div class="format-checkboxes">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="format-caps" checked />
+                    Convert to UPPERCASE
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="format-sentences" checked />
+                    One sentence per line
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="format-paragraphs" checked />
+                    Add paragraph breaks
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="format-punctuation" checked />
+                    Enhance punctuation pauses
+                  </label>
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="format-numbers" checked />
+                    Convert numbers to words
+                  </label>
+                </div>
+              </details>
+            </div>
+          </div>
 
-            <div class="text-preview">
-                <h3>Text Preview</h3>
-                <div class="preview-area">
-                    <div id="text-preview" contenteditable="true">
-                        <p>Welcome to the Teleprompter Controller!</p>
-                        <p>Upload your manuscript or edit this text directly.</p>
-                        <p>The changes will be synchronized with the display in real-time.</p>
-                    </div>
-                </div>
+          <div class="control-group">
+            <label for="speed-control">Speed (words/min):</label>
+            <input
+              type="range"
+              id="speed-control"
+              min="60"
+              max="300"
+              value="150"
+            />
+            <span id="speed-display">150</span>
+          </div>
+
+          <div class="control-group">
+            <label for="segment-length">Segment Length:</label>
+            <div class="time-input-group">
+              <div class="time-input">
+                <input
+                  type="number"
+                  id="segment-minutes"
+                  min="0"
+                  max="99"
+                  value="10"
+                />
+                <label for="segment-minutes">min</label>
+              </div>
+              <div class="time-separator">:</div>
+              <div class="time-input">
+                <input
+                  type="number"
+                  id="segment-seconds"
+                  min="0"
+                  max="59"
+                  value="0"
+                />
+                <label for="segment-seconds">sec</label>
+              </div>
             </div>
+            <div class="duration-info">
+              <div class="info-row">
+                <span>Word count: <span id="word-count">0</span></span>
+              </div>
+              <div class="info-row">
+                <span
+                  >Expected duration:
+                  <span id="expected-duration">0:00</span></span
+                >
+              </div>
+              <div class="info-row duration-diff" id="duration-diff">
+                <span>Difference: <span id="diff-value">0:00</span></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label for="font-size">Font Size:</label>
+            <input type="range" id="font-size" min="16" max="72" value="48" />
+            <span id="font-size-display">48px</span>
+          </div>
+
+          <div class="control-group">
+            <label for="scheduled-start">Scheduled Start Time:</label>
+            <div class="scheduled-time-group">
+              <input type="datetime-local" id="scheduled-start" step="1" />
+              <button id="clear-schedule" class="control-btn">Clear</button>
+            </div>
+            <div class="schedule-info" id="schedule-info">
+              <span>No scheduled start time set</span>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Display Options:</label>
+            <div class="checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="mirror-mode" />
+                Mirror Mode
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="hide-timer" />
+                Hide Timer
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="on-air-mode" />
+                On Air Indicator
+              </label>
+            </div>
+          </div>
         </div>
 
-        <div class="control-panel">
-            <div class="playback-controls">
-                <button id="start-btn" class="control-btn start">
-                    <span class="btn-icon">▶</span>
-                    Start
-                </button>
-                <button id="pause-btn" class="control-btn pause" disabled>
-                    <span class="btn-icon">⏸</span>
-                    Pause
-                </button>
-                <button id="reset-btn" class="control-btn reset">
-                    <span class="btn-icon">⏹</span>
-                    Reset
-                </button>
+        <div class="text-preview">
+          <h3>Text Preview</h3>
+          <div class="preview-area">
+            <div id="text-preview" contenteditable="true">
+              <p>Welcome to the Teleprompter Controller!</p>
+              <p>Upload your manuscript or edit this text directly.</p>
+              <p>
+                The changes will be synchronized with the display in real-time.
+              </p>
             </div>
-            
-            <div class="timer-info">
-                <div class="timer-display">
-                    <div class="timer-item">
-                        <label>Segment Time:</label>
-                        <span id="segment-timer">10:00</span>
-                    </div>
-                    <div class="timer-item">
-                        <label>Elapsed:</label>
-                        <span id="elapsed-timer">00:00</span>
-                    </div>
-                </div>
-            </div>
+          </div>
         </div>
+      </div>
+
+      <div class="control-panel">
+        <div class="playback-controls">
+          <button id="start-btn" class="control-btn start">
+            <span class="btn-icon">▶</span>
+            Start
+          </button>
+          <button id="pause-btn" class="control-btn pause" disabled>
+            <span class="btn-icon">⏸</span>
+            Pause
+          </button>
+          <button id="reset-btn" class="control-btn reset">
+            <span class="btn-icon">⏹</span>
+            Reset
+          </button>
+        </div>
+
+        <div class="timer-info">
+          <div class="timer-display">
+            <div class="timer-item">
+              <label>Segment Time:</label>
+              <span id="segment-timer">10:00</span>
+            </div>
+            <div class="timer-item">
+              <label>Elapsed:</label>
+              <span id="elapsed-timer">00:00</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
     <script src="controller.js"></script>
-</body>
+  </body>
 </html>
