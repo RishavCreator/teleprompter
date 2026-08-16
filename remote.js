@@ -12,6 +12,8 @@ class TeleprompterRemote {
     this.btnDown = document.getElementById('btn-down');
     this.speedSlider = document.getElementById('speed');
     this.speedVal = document.getElementById('speed-val');
+    this.fontSizeSlider = document.getElementById('font-size');
+    this.fontSizeVal = document.getElementById('font-size-val');
     this.statusEl = document.getElementById('status');
     
     this.bindEvents();
@@ -43,6 +45,13 @@ class TeleprompterRemote {
       this.speedVal.textContent = e.target.value + ' wpm';
       this.sendMessage({ type: "setSpeed", value: parseInt(e.target.value) });
     });
+    
+    if (this.fontSizeSlider) {
+      this.fontSizeSlider.addEventListener('input', (e) => {
+        this.fontSizeVal.textContent = e.target.value + 'px';
+        this.sendMessage({ type: "setFontSize", value: parseInt(e.target.value) });
+      });
+    }
   }
 
   connectWebSocket() {
@@ -107,6 +116,11 @@ class TeleprompterRemote {
     } else if (data.type === "setSpeed") {
       this.speedSlider.value = data.value;
       this.speedVal.textContent = data.value + ' wpm';
+    } else if (data.type === "setFontSize") {
+      if (this.fontSizeSlider) {
+        this.fontSizeSlider.value = data.value;
+        this.fontSizeVal.textContent = data.value + 'px';
+      }
     }
   }
 
@@ -115,6 +129,10 @@ class TeleprompterRemote {
     if (state.speed) {
       this.speedSlider.value = state.speed;
       this.speedVal.textContent = state.speed + ' wpm';
+    }
+    if (state.fontSize && this.fontSizeSlider) {
+      this.fontSizeSlider.value = state.fontSize;
+      this.fontSizeVal.textContent = state.fontSize + 'px';
     }
   }
 

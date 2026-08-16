@@ -523,3 +523,52 @@ body {
     justify-content: center;
   }
 }
+
+/* Dark Mode Styles */
+body.dark-mode {
+  background: #1a1a1a;
+  color: #f5f5f5;
+}
+
+body.dark-mode .controller-header {
+  background: #000;
+}
+
+body.dark-mode .controls-section {
+  background: #2a2a2a;
+  color: #f5f5f5;
+  box-shadow: 0 2px 10px rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .control-group label,
+body.dark-mode .format-details summary,
+body.dark-mode .timer-item label {
+  color: #e0e0e0;
+}
+
+body.dark-mode .control-group input[type="file"],
+body.dark-mode .control-group input[type="number"],
+body.dark-mode .formatting-options,
+body.dark-mode .timer-info {
+  background: #333;
+  color: #f5f5f5;
+  border-color: #555;
+}
+
+body.dark-mode .format-checkboxes .checkbox-label {
+  color: #ccc;
+}
+
+body.dark-mode .text-preview h3 {
+  color: #f5f5f5;
+  border-bottom-color: #444;
+}
+
+body.dark-mode .preview-area {
+  background: #2a2a2a;
+  border-color: #444;
+}
+
+body.dark-mode #text-preview {
+  color: #f5f5f5;
+}

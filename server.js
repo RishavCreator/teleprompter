@@ -34,7 +34,7 @@ const server = http.createServer((req, res) => {
 
   let filePath = path.join(
     __dirname,
-    req.url === "/" ? "controller.html" : req.url,
+    req.url === "/" ? "remote.html" : req.url,
   );
 
   // Security check - prevent directory traversal

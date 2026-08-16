@@ -1,16 +1,27 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
-
-// Use a specific port for the desktop app
-const PORT = 8080;
-process.env.PORT = PORT;
-
-// Start the existing server
-require("./server.js");
+const net = require("net");
 
 let mainWindow;
 
-function createWindow() {
+function getAvailablePort(startPort, cb) {
+  const server = net.createServer();
+  server.listen(startPort, () => {
+    const port = server.address().port;
+    server.close(() => {
+      cb(port);
+    });
+  });
+  server.on("error", (err) => {
+    if (err.code === "EADDRINUSE") {
+      getAvailablePort(0, cb); // Fallback to random available port
+    } else {
+      cb(startPort);
+    }
+  });
+}
+
+function createWindow(port) {
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -24,7 +35,7 @@ function createWindow() {
 
   // Give the server a brief moment to start up before loading the page
   setTimeout(() => {
-    mainWindow.loadURL(`http://localhost:${PORT}/controller.html`);
+    mainWindow.loadURL(`http://localhost:${port}/controller.html`);
   }, 500);
 
   mainWindow.on("closed", function () {
@@ -32,7 +43,14 @@ function createWindow() {
   });
 }
 
-app.on("ready", createWindow);
+app.on("ready", () => {
+  getAvailablePort(8080, (port) => {
+    process.env.PORT = port;
+    // Start the existing server on the available port
+    require("./server.js");
+    createWindow(port);
+  });
+});
 
 app.on("window-all-closed", function () {
   if (process.platform !== "darwin") {
@@ -42,6 +60,8 @@ app.on("window-all-closed", function () {
 
 app.on("activate", function () {
   if (mainWindow === null) {
-    createWindow();
+    getAvailablePort(8080, (port) => {
+      createWindow(port);
+    });
   }
 });

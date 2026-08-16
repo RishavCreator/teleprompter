@@ -16,12 +16,14 @@ class TeleprompterController {
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 5;
     this.reconnectDelay = 1000;
+    this.originalText = "";
 
     this.initializeElements();
     this.bindEvents();
     this.connectWebSocket();
     this.updateDurationCalculations();
     this.updateDisplayUrl();
+    this.updateFontSize(this.fontSize);
   }
 
   initializeElements() {
@@ -57,6 +59,7 @@ class TeleprompterController {
     this.copyUrlBtn = document.getElementById("copy-url");
     this.showQrBtn = document.getElementById("show-qr");
     this.toggleSidebarBtn = document.getElementById("toggle-sidebar");
+    this.toggleDarkModeBtn = document.getElementById("toggle-dark-mode");
     this.qrContainer = document.getElementById("qr-container");
     this.qrCanvas = document.getElementById("qr-canvas");
     this.formatBtn = document.getElementById("format-text");
@@ -110,6 +113,24 @@ class TeleprompterController {
       this.formatTextForTeleprompter(),
     );
 
+    const formattingCheckboxes = [
+      this.formatCapsCheckbox,
+      this.formatSentencesCheckbox,
+      this.formatParagraphsCheckbox,
+      this.formatPunctuationCheckbox,
+      this.formatNumbersCheckbox
+    ];
+    formattingCheckboxes.forEach(cb => {
+      cb.addEventListener("change", () => {
+        if (this.originalText) {
+          const formatted = this.formatTextForTeleprompterStandards(this.originalText);
+          this.setPrompterTextDirectly(formatted);
+        } else {
+          this.formatTextForTeleprompter();
+        }
+      });
+    });
+
     if (this.toggleSidebarBtn) {
       this.toggleSidebarBtn.addEventListener("click", () => {
         const sidebar = document.querySelector('.controls-section');
@@ -124,11 +145,23 @@ class TeleprompterController {
       });
     }
 
+    if (this.toggleDarkModeBtn) {
+      this.toggleDarkModeBtn.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+        if (document.body.classList.contains("dark-mode")) {
+          this.toggleDarkModeBtn.textContent = "☀️";
+        } else {
+          this.toggleDarkModeBtn.textContent = "🌙";
+        }
+      });
+    }
+
     // Initially show formatting options
     this.formattingOptions.style.display = "block";
 
     // Text preview updates
     this.textPreview.addEventListener("input", () => {
+      this.originalText = this.textPreview.innerText;
       this.sendTextUpdate();
       this.updateDurationCalculations();
     });
@@ -383,6 +416,7 @@ class TeleprompterController {
       }
 
       if (text !== undefined) {
+        this.originalText = text;
         this.setPrompterText(text);
       }
     } catch (error) {
@@ -486,6 +520,7 @@ class TeleprompterController {
   }
 
   clearText() {
+    this.originalText = "";
     this.textPreview.innerHTML =
       "<p>Upload your manuscript or type your text here...</p>";
     this.sendTextUpdate();
@@ -522,6 +557,12 @@ class TeleprompterController {
   updateFontSize(value) {
     this.fontSize = parseInt(value);
     this.fontSizeDisplay.textContent = this.fontSize + "px";
+    
+    if (this.textPreview) {
+      this.textPreview.style.fontSize = this.fontSize + "px";
+      this.textPreview.style.lineHeight = "1.5";
+    }
+
     this.sendMessage({ type: "setFontSize", value: this.fontSize });
   }
 

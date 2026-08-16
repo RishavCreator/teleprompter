@@ -21,6 +21,7 @@
             <button id="copy-url">Copy</button>
             <button id="show-qr" class="format-btn" style="margin-left: 5px;">QR Code</button>
             <button id="toggle-sidebar" class="format-btn" style="margin-left: 5px;">Toggle Sidebar</button>
+            <button id="toggle-dark-mode" class="format-btn" style="margin-left: 5px;">🌙</button>
             <div id="qr-container" style="display: none; position: absolute; right: 0; top: 100%; margin-top: 10px; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 100;">
               <canvas id="qr-canvas"></canvas>
             </div>
@@ -41,6 +42,18 @@
               <button id="reset-btn" class="control-btn reset" style="flex: 1; padding: 12px 10px;">
                 <span class="btn-icon">⏹</span> Reset
               </button>
+            </div>
+            
+            <div class="control-group" style="background: white; margin-bottom: 0;">
+              <label for="speed-control">Speed (words/min):</label>
+              <input type="range" id="speed-control" min="60" max="300" value="150" />
+              <span id="speed-display">150</span>
+            </div>
+
+            <div class="control-group" style="background: white; margin-bottom: 0;">
+              <label for="font-size">Font Size:</label>
+              <input type="range" id="font-size" min="16" max="72" value="48" />
+              <span id="font-size-display">48px</span>
             </div>
             <div class="timer-info" style="display: flex; justify-content: center; background: #f8f9fa; padding: 10px; border-radius: 6px;">
               <div class="timer-display" style="gap: 30px;">
@@ -97,17 +110,6 @@
             </div>
           </div>
 
-          <div class="control-group">
-            <label for="speed-control">Speed (words/min):</label>
-            <input
-              type="range"
-              id="speed-control"
-              min="60"
-              max="300"
-              value="150"
-            />
-            <span id="speed-display">150</span>
-          </div>
 
           <div class="control-group">
             <label for="segment-length">Segment Length:</label>
@@ -150,11 +152,6 @@
             </div>
           </div>
 
-          <div class="control-group">
-            <label for="font-size">Font Size:</label>
-            <input type="range" id="font-size" min="16" max="72" value="48" />
-            <span id="font-size-display">48px</span>
-          </div>
 
           <div class="control-group">
             <label for="scheduled-start">Scheduled Start Time:</label>
